@@ -1,0 +1,13 @@
+FROM box-api:v0
+WORKDIR /var/app
+ADD package.json /var/app/
+
+ENV NODE_ENV dev
+
+ADD test test
+
+RUN npm update 
+RUN npm install -g mocha supertest chai 
+RUN npm install
+ENTRYPOINT ["npm", "run"]
+CMD ["test"]

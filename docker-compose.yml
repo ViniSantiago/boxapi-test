@@ -1,0 +1,140 @@
+version: '3'
+services:
+
+
+###############################################################################
+# BOX - Node Application
+###############################################################################
+  box-api:
+    image: box-api:v0
+    build: .
+    ports:
+      - '3443:3443'
+    restart: always
+    environment:
+      - MONGO_HOST=box-mongo-db
+      - MONGO_PORT=27017
+      - MONGO_URL=mongodb://box-mongo-db:27017/box
+
+    networks:
+      - box-net
+
+###############################################################################
+# MongoDB - DB NoSQL
+###############################################################################
+  box-mongo-db:
+    image: mongo:3.2.18
+    volumes:
+      - data-volumes:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - box-net
+
+###############################################################################
+# mongo-express - Web-based MongoDB admin interface
+###############################################################################
+  mongo-express:
+    image: mongo-express:0.45.0
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=box
+      - ME_CONFIG_BASICAUTH_PASSWORD=box
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_SERVER=box-mongo-db
+      - ME_CONFIG_OPTIONS_EDITORTHEME=default
+    ports:
+      - '8081:8081'
+    networks:
+      - box-net
+
+###############################################################################
+# Swagger UI - API Development Tools
+###############################################################################
+  swagger:
+    container_name: boxapi-swagger
+    image: swaggerapi/swagger-ui:3.18.1
+    ports:
+      - "8009:8080"
+    networks:
+      - box-net
+    environment:
+      SWAGGER_JSON: /doc/box-swagger.json
+    volumes: 
+      - ./swagger/doc:/doc
+      - ./swagger/site:/usr/share/nginx/html
+
+###############################################################################
+# Prometheus - Monitoring system & time series database
+###############################################################################
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - box-net
+    ports:
+      - '9090:9090'
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - '9100:9100'
+    networks:
+      - box-net
+
+  mongodb-exporter:
+    image: targetprocess/mongodb_exporter
+    ports:
+      - "9001:9001"
+    networks:
+      - box-net
+    environment:
+      MONGODB_URL: "box-mongo-db:27017"
+
+###############################################################################
+# Grafana - The open platform for beautiful analytics and monitoring
+###############################################################################
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - "${PWD}/grafana/dashboards:/etc/grafana/provisioning/dashboards"
+      - "${PWD}/grafana/datasources:/etc/grafana/provisioning/datasources"
+      - "${PWD}/grafana/etc:/etc/grafana"
+      - "${PWD}/grafana/data/:/var/lib/grafana"
+    networks:
+      - box-net
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=box
+      - DS_MONGODB=Prometheus
+    depends_on:
+      - prometheus
+###############################################################################
+# Mocha - Integration Test
+###############################################################################
+  box-api-test:
+    build: 
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: teste-api
+    ports:
+      - '3001:3443'
+    environment:
+      - MONGO_HOST=box-mongo-db
+      - MONGO_PORT=27017
+      - MONGO_URL=mongodb://box-mongo-db:27017/box  
+    networks:
+      - box-net
+
+volumes:
+  data-volumes:
+
+networks:
+  box-net:
+    ipam:
+      driver: default
+      config:
+        - subnet:  192.168.2.1/8

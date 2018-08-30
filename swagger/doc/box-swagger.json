@@ -1,0 +1,215 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "BOX API",
+    "description": "API para manipular usuário e produtos"
+  },
+  "host": "conta.apps.io.bb.com.br",
+  "basePath": "/api/v0",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],  
+  "paths": {
+    "/user/getme": {
+      "post": {
+        "operationId": "POST_getme-user",
+        "summary": "Get a existing user",
+        "tags": [
+          "EndPoints"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/getmebyemail",
+              "example": {
+                "email": "email@bb.com.br"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "API Client Key undefined"
+          },
+          "401": {
+            "description": "Authentication Required"
+          },
+          "403": {
+            "$ref": "#/definitions/error"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/user/signup": {
+      "put": {
+        "operationId": "PUT_signup-user",
+        "summary": "Sign up a new user",
+        "tags": [
+          "EndPoints"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/user",
+              "example": {
+                "name": "name",
+                "email": "email@bb.com.br"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "API Client Key undefined"
+          },
+          "401": {
+            "description": "Authentication Required"
+          },
+          "403": {
+            "$ref": "#/definitions/error"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/user/listall": {
+      "get": {
+        "operationId": "GET_listall-user",
+        "summary": "List all users",
+        "tags": [
+          "EndPoints"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "API Client Key undefined"
+          },
+          "401": {
+            "description": "Authentication Required"
+          },
+          "403": {
+            "$ref": "#/definitions/error"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/user/deletebyid/{id}": {
+      "parameters": [
+        {
+          "name": "userid",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "operationId": "DELETE_user-id",
+        "summary": "Delete user by id",
+        "tags": [
+          "EndPoints"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "API Client Key undefined"
+          },
+          "401": {
+            "description": "Authentication Required"
+          },
+          "403": {
+            "$ref": "#/definitions/error"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "error": {
+      "title": "Error",
+      "description": "Error",
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "integer"
+        },
+        "errmsg": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer"
+        },
+        "codeName": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "user": {
+      "title": "User",
+      "type": "object",
+      "properties": {
+        "userid": {
+          "type": "string"
+        },
+        "kernelid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "cellphone": {
+          "type": "number"
+        },
+        "cpfcnpj": {
+          "type": "number"
+        }
+      }
+    },
+    "getmebyemail": {
+      "title": "GetMeByEmail",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
