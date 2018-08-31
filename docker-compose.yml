@@ -125,7 +125,9 @@ services:
     environment:
       - MONGO_HOST=box-mongo-db
       - MONGO_PORT=27017
-      - MONGO_URL=mongodb://box-mongo-db:27017/box  
+      - MONGO_URL=mongodb://box-mongo-db:27017/test
+      - MONGO_PWD=box
+      - MONGO_USER=box  
     networks:
       - box-net
 

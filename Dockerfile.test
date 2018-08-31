@@ -6,8 +6,8 @@ ENV NODE_ENV dev
 
 ADD test test
 
-RUN npm update 
-RUN npm install -g mocha supertest chai 
+#RUN npm update 
+#RUN npm install mocha supertest chai 
 RUN npm install
 ENTRYPOINT ["npm", "run"]
 CMD ["test"]
